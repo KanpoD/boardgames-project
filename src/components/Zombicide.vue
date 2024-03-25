@@ -1,18 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref } from 'vue'
+import { useDraggable } from '@vueuse/core'
 import TileCards from './TileCards.vue';
 
-const router = useRouter()
-const route = useRoute()
+const el = ref<HTMLElement | null>(null)
 
-const search = computed({
-  get() {
-    return route.query.search ?? ''
-  },
-  set(search) {
-    router.replace({ query: { search } })
-  }
+// `style` will be a helper computed for `left: ?px; top: ?px;`
+const { x, y, style } = useDraggable(el, {
+  initialValue: { x: 40, y: 40 },
 })
 </script>
 
@@ -25,7 +20,9 @@ const search = computed({
       </div>
     </div>
     <div class="right-panel">
-
+      <div ref="el" :style="style" style="position: fixed">
+        Drag me! I am at {{ x }}, {{ y }}
+      </div>>
     </div>
   </div>
 </template>
@@ -34,6 +31,7 @@ const search = computed({
 .elements {
   height: 85%;
 }
+
 .content-container {
   width: 90vw;
   height: 80vh;
@@ -42,14 +40,15 @@ const search = computed({
   border-radius: 15px;
 }
 
-.title {
-}
+.title {}
+
 .left-panel {
   width: 35%;
   height: 100%;
   background-color: #a8a8a8;
   border-radius: 15px 0 0 15px;
 }
+
 .right-panel {
   width: 65%;
   height: 100%;
