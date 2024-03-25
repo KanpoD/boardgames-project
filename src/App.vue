@@ -1,7 +1,8 @@
 <template>
-  <h1>Hello App!</h1>
+
 
   <main>
+    <h1>Hello App!</h1>
     <NavBar />
     <RouterView />
   </main>
@@ -18,3 +19,9 @@ export default {
 }
 
 </script>
+
+<style>
+main {
+  padding-top: 50px;
+}
+</style>
