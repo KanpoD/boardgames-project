@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import TileCard from './TileCard.vue';
+import TileCards from './TileCards.vue';
 
 const router = useRouter()
 const route = useRoute()
@@ -22,7 +22,7 @@ const search = computed({
     <div class="left-panel">
       <div class="elements">
         <div class="tiles">
-          <TileCard />
+          <TileCards />
         </div>
       </div>
     </div>
