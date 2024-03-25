@@ -21,9 +21,7 @@ const search = computed({
   <div class="content-container">
     <div class="left-panel">
       <div class="elements">
-        <div class="tiles">
-          <TileCards />
-        </div>
+        <TileCards />
       </div>
     </div>
     <div class="right-panel">
@@ -33,11 +31,15 @@ const search = computed({
 </template>
 
 <style>
-
+.elements {
+  height: 85%;
+}
 .content-container {
   width: 90vw;
   height: 80vh;
   display: flex;
+  box-shadow: 2px 2px 20px grey;
+  border-radius: 15px;
 }
 
 .title {
@@ -45,11 +47,13 @@ const search = computed({
 .left-panel {
   width: 35%;
   height: 100%;
-  background-color: lightcoral;
+  background-color: #a8a8a8;
+  border-radius: 15px 0 0 15px;
 }
 .right-panel {
   width: 65%;
   height: 100%;
-  background-color: green;
+  background-color: lightgray;
+  border-radius: 0 15px 15px 0;
 }
 </style>
