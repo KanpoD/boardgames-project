@@ -6,7 +6,7 @@
         </div>
         <div class="flex_row_align router_link">
             <RouterLink to="/">Go to Home</RouterLink>
-            <RouterLink to="/about">Go to About</RouterLink>
+            <RouterLink to="/zombicide">Go to About</RouterLink>
         </div>
 
     </nav>
@@ -20,7 +20,7 @@ nav {
     top: 0;
     left: 0;
     width: 100%;
-    min-height: 50px;
+    height: 6vh;
     background-color: #230C0F;
 }
 

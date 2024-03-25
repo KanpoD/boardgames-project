@@ -1,6 +1,5 @@
 <template>
   <main>
-    <h1>Hello App!</h1>
     <NavBar />
     <RouterView />
   </main>
@@ -22,7 +21,4 @@ export default {
 
 @import 'style.css';
 
-main {
-  padding-top: 50px;
-}
 </style>

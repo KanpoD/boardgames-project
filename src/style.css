@@ -95,3 +95,8 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
 }
+
+#app {
+  margin: 0 auto;
+  text-align: center;
+}

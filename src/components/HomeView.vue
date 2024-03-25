@@ -4,7 +4,7 @@
 export default {
   methods: {
     goToAbout() {
-      this.$router.push('/about')
+      this.$router.push('/zombicide')
     },
   },
 }
