@@ -1,6 +1,4 @@
 <template>
-
-
   <main>
     <h1>Hello App!</h1>
     <NavBar />
@@ -21,6 +19,9 @@ export default {
 </script>
 
 <style>
+
+@import 'style.css';
+
 main {
   padding-top: 50px;
 }
