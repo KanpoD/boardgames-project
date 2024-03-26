@@ -57,7 +57,6 @@ export default {
   <div class="container tiles-container">
     <img class="tile" v-for="tile in tiles" :src="tile.url" :alt="tile.alt"/>
   </div>
-  <div class="separation-line"></div>
   <div class="container tokens-container">
     <img class="token" v-for="token in tokens" :src="token.url" :alt="token.alt"/>
   </div>
@@ -74,10 +73,12 @@ export default {
 
 .tiles-container {
   height: 60%;
+  border-bottom: 1px solid black;
 }
 
 .tokens-container {
   height: 35%;
+  overflow: auto;
 }
 
 .tile {
@@ -89,11 +90,4 @@ export default {
   padding: 1rem;
 }
 
-.separation-line {
-  box-shadow: 0 0 8px grey;
-  margin: 5px 0;
-  height: 2px;
-  width: 100%;
-  background-color: black;
-}
 </style>
