@@ -1,16 +1,11 @@
-<script lang="ts">
+<script setup lang="ts">
 
 
-export default {
-  methods: {
-    goToAbout() {
-      this.$router.push('/zombicide')
-    },
-  },
-}
 </script>
 
 <template>
   <h2>HomeView</h2>
-  <button @click="goToAbout()">Go to About</button>
+  <router-link to="/zombicide">Zombicide</router-link>
+  <router-link to="/dobble">Dobble</router-link>
+  <!-- <button @click="goToAbout()">Go to About</button> -->
 </template>
