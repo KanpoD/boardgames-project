@@ -1,6 +1,22 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import TileCards from './TileCards.vue';
+
+interface TileObject {
+  url: string;
+  isTileClicked: boolean;
+  backgroundSet: boolean;
+}
+
+let selectedTileImage = ref<TileObject | null>(null);
+
+const handleTileSelected = (tileObject: { url: string; isTileClicked: boolean; backgroundSet: boolean }) => {
+  if ('url' in tileObject && 'isTileClicked' in tileObject && 'backgroundSet' in tileObject) {
+    selectedTileImage.value = tileObject;
+    tileObject.isTileClicked = false;
+    console.log(selectedTileImage.value?.url);
+  }
+}
 const scale = ref(1);
 const rightPanel = ref<HTMLElement | null>(null);
 let isDragging = false;
@@ -12,6 +28,7 @@ let maxTranslateX = ref(400);
 let maxTranslateY = ref(400);
 let minTranslateX = ref(-400);
 let minTranslateY = ref(-1000);//revoir les valeurs ici, peut etre les changer en fonction du scale ?
+
 
 const startDrag = (event: MouseEvent) => {
   isDragging = true;
@@ -83,6 +100,44 @@ const handleZoom = (event: WheelEvent) => {
   }
   scale.value = newScale;
 };
+
+const handleCellClick = (cell: HTMLElement) => {
+  let rotationDegree = 0;
+
+  cell.addEventListener('click', () => {
+    if (selectedTileImage.value) {
+      const imagePath = `url(${selectedTileImage.value.url})`;
+      cell.style.backgroundImage = imagePath;
+      selectedTileImage.value = null;
+    } else if (cell.style.backgroundImage !== 'none') {
+      rotationDegree += 90;//Changer ça tard plus
+      cell.style.transform = `rotate(${rotationDegree}deg)`;
+    }
+  });
+};
+
+const handleGridHover = (row: number, column: number) => {
+  const cell = document.querySelector(`.grid-item[row="${row}"][column="${column}"]`) as HTMLElement;
+
+  if (cell && selectedTileImage.value) {
+    console.log(row, column);
+    const imagePath = `url(${selectedTileImage.value.url})`;
+    let isBkSet = selectedTileImage.value.backgroundSet;
+    console.log(isBkSet);
+
+    if (!isBkSet) {
+      cell.style.backgroundImage = imagePath;
+    }
+
+    cell.addEventListener('mouseleave', () => {
+      if (selectedTileImage.value && !selectedTileImage.value.backgroundSet) {
+        cell.style.backgroundImage = 'none';
+      }
+    });
+
+    handleCellClick(cell);
+  }
+};
 </script>
 
 <template>
@@ -91,7 +146,7 @@ const handleZoom = (event: WheelEvent) => {
     <div class="content-container">
       <div class="left-panel">
         <div class="elements">
-          <TileCards />
+          <TileCards @tile-selected="handleTileSelected" />
         </div>
       </div>
       <div class="right-content">
@@ -100,7 +155,9 @@ const handleZoom = (event: WheelEvent) => {
           <div class="grid-container"
             :style="{ transform: `translate(${translateX}px, ${translateY}px) scale(${scale})` }">
             <div class="grid-row" v-for="row in 12" :key="row">
-              <div class="grid-item" v-for="column in 12" :key="column"></div>
+              <div class="grid-item" v-for="column in 12" :key="column" :row="row" :column="column"
+                :style="{ 'background-image': 'none' }" @mousemove="handleGridHover(row, column)">
+              </div>
             </div>
           </div>
         </div>
@@ -144,6 +201,7 @@ const handleZoom = (event: WheelEvent) => {
 
 .right-content {
   display: flex;
+  width: 70%;
   flex-direction: column;
 }
 
@@ -182,5 +240,9 @@ const handleZoom = (event: WheelEvent) => {
   border: 1px solid black;
   width: 100px;
   height: 100px;
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  z-index: 2;
 }
 </style>

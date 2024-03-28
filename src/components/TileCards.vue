@@ -1,26 +1,27 @@
 <script lang="ts">
 export default {
-  data () {
+  emits: ["tile-selected"],
+  data() {
     return {
       tiles: [
-        { url: '/src/assets/tiles/1R.png', alt: '1R' },
-        { url: '/src/assets/tiles/1V.png', alt: '1V' },
-        { url: '/src/assets/tiles/2R.png', alt: '2R' },
-        { url: '/src/assets/tiles/2V.png', alt: '2V' },
-        { url: '/src/assets/tiles/3R.png', alt: '3R' },
-        { url: '/src/assets/tiles/3V.png', alt: '3V' },
-        { url: '/src/assets/tiles/4R.png', alt: '4R' },
-        { url: '/src/assets/tiles/4V.png', alt: '4V' },
-        { url: '/src/assets/tiles/5R.png', alt: '5R' },
-        { url: '/src/assets/tiles/5V.png', alt: '5V' },
-        { url: '/src/assets/tiles/6R.png', alt: '6R' },
-        { url: '/src/assets/tiles/6V.png', alt: '6V' },
-        { url: '/src/assets/tiles/7R.png', alt: '7R' },
-        { url: '/src/assets/tiles/7V.png', alt: '7V' },
-        { url: '/src/assets/tiles/8R.png', alt: '8R' },
-        { url: '/src/assets/tiles/8V.png', alt: '8V' },
-        { url: '/src/assets/tiles/9R.png', alt: '9R' },
-        { url: '/src/assets/tiles/9V.png', alt: '9V' }
+        { url: '/src/assets/tiles/1R.png', alt: '1R', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/1V.png', alt: '1V', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/2R.png', alt: '2R', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/2V.png', alt: '2V', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/3R.png', alt: '3R', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/3V.png', alt: '3V', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/4R.png', alt: '4R', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/4V.png', alt: '4V', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/5R.png', alt: '5R', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/5V.png', alt: '5V', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/6R.png', alt: '6R', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/6V.png', alt: '6V', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/7R.png', alt: '7R', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/7V.png', alt: '7V', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/8R.png', alt: '8R', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/8V.png', alt: '8V', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/9R.png', alt: '9R', backgroundSet: false, x: 0, y: 0, isTileClicked: false },
+        { url: '/src/assets/tiles/9V.png', alt: '9V', backgroundSet: false, x: 0, y: 0, isTileClicked: false }
       ],
       tokens: [
         { url: '/src/assets/other-tokens/Car-PimpMobile.png', alt: 'Car-PimpMobile.png' },
@@ -42,10 +43,88 @@ export default {
         { url: '/src/assets/doors/Door-Open-Blue.png', alt: 'Door-Open-Blue.png' },
         { url: '/src/assets/doors/Door-Open-Green.png', alt: 'Door-Open-Green.png' },
         { url: '/src/assets/doors/Door-Open-Red.png', alt: 'Door-Open-Red.png' }
-      ]
+      ],
+      isTileClicked: false,
+      activeTileIndex: null,
+      cursorOffsetX: 0,
+      cursorOffsetY: 0,
+      onEditor: false,
+      counter: 0
     }
   },
-    
+  methods: {
+    handleClick(tileIndex: number, event: any) {
+
+      if (this.isTileClicked) {
+        console.log('je ne passe pas par ici quand il faut ');
+        this.isTileClicked = false;
+        this.activeTileIndex = null;
+        // }
+      } else {
+        
+        this.isTileClicked = true;
+        console.log(this.tiles[tileIndex]);
+        this.activeTileIndex = tileIndex;
+        // recup la pos du curseur par rapport aux 4 coins de la fenetre
+        const rect = event.target.getBoundingClientRect();
+        this.cursorOffsetX = event.clientX - rect.left;
+        this.cursorOffsetY = event.clientY - rect.top;
+        this.tiles[this.activeTileIndex].x = event.clientX - this.cursorOffsetX;
+        this.tiles[this.activeTileIndex].y = event.clientY - this.cursorOffsetY;
+        this.$emit('tile-selected', this.tiles[tileIndex]); //Envoyer l'url au daron 
+      }
+    },
+    handleMouseMove(event: any) {
+      if (this.isTileClicked) {
+        const tileElement = event.target as HTMLElement;
+        const tileRect = tileElement.getBoundingClientRect();
+
+        // Calculer les coordonnées du milieu de l'image sélectionnée
+        const tileMidX = Math.round(tileRect.left + tileRect.width / 2);
+        const tileMidY = Math.round(tileRect.top + tileRect.height / 2);
+
+        const editorRect = document.querySelector('.grid-container')?.getBoundingClientRect();
+
+        if (editorRect && tileMidY < Math.round(editorRect.bottom) && tileMidX > Math.round(editorRect.left) && tileMidX < Math.round(editorRect.right)) {
+          this.onEditor = true;
+
+        } else {
+          this.onEditor = false;
+        }
+      }
+      if (this.isTileClicked && this.activeTileIndex !== null) {
+        const tileMidX = this.tiles[this.activeTileIndex].x + (75);
+        const tileMidY = this.tiles[this.activeTileIndex].y + (75);
+
+        const offsetX = event.clientX - tileMidX;
+        const offsetY = event.clientY - tileMidY;
+
+        this.tiles[this.activeTileIndex].x += offsetX;
+        this.tiles[this.activeTileIndex].y += offsetY;
+      }
+    },
+    handleClickWin(event: any) {
+      if (this.isTileClicked && this.counter === 2 ) {
+        this.isTileClicked = false;
+        this.activeTileIndex = null;
+        this.counter = 0;
+        console.log('je delete la tile');
+      } else {
+        console.log('R A S');
+      }
+    }
+  },
+  mounted() {
+    // activer la detection de la souris sur toute la fenetre
+    window.addEventListener('mousemove', this.handleMouseMove);
+    window.addEventListener('click', this.handleClickWin);
+  },
+  beforeDestroy() {
+    // enlever la detection
+    window.removeEventListener('mousemove', this.handleMouseMove);
+    window.removeEventListener('click', this.handleClickWin);
+  },
+
 }
 
 </script>
@@ -55,10 +134,13 @@ export default {
     <label>ELEMENTS</label>
   </div>
   <div class="container tiles-container">
-    <img class="tile" v-for="tile in tiles" :src="tile.url" :alt="tile.alt"/>
+    <img class="tile" v-for="(tile, index) in tiles" :key="index" :src="tile.url" :alt="tile.alt"
+    @click="handleClick(index, $event)"
+      :style="{ position: isTileClicked && activeTileIndex === index ? 'absolute' : 'static', left: tile.x + 'px', top: tile.y + 'px', display: activeTileIndex === index && onEditor === true ? 'none' : 'block' }" />
   </div>
+  <!-- pointerEvents: isTileClicked ? 'none' : 'auto' -->
   <div class="container tokens-container">
-    <img class="token" v-for="token in tokens" :src="token.url" :alt="token.alt"/>
+    <img class="token" v-for="token in tokens" :src="token.url" :alt="token.alt" />
   </div>
 </template>
 
@@ -72,8 +154,13 @@ export default {
 }
 
 .tiles-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
   height: 60%;
   border-bottom: 1px solid black;
+  overflow-x: hidden;
 }
 
 .tokens-container {
@@ -82,12 +169,15 @@ export default {
 }
 
 .tile {
-  width: 8rem;
+  width: 124px;
   padding: 1rem;
+  z-index: 1;
+  user-select: none;
+
 }
+
 
 .token {
   padding: 1rem;
 }
-
 </style>
