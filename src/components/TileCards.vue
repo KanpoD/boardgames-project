@@ -61,7 +61,7 @@ export default {
         this.activeTileIndex = null;
         // }
       } else {
-        
+
         this.isTileClicked = true;
         console.log(this.tiles[tileIndex]);
         this.activeTileIndex = tileIndex;
@@ -75,23 +75,24 @@ export default {
       }
     },
     handleMouseMove(event: any) {
-      if (this.isTileClicked) {
-        const tileElement = event.target as HTMLElement;
-        const tileRect = tileElement.getBoundingClientRect();
 
-        // Calculer les coordonnées du milieu de l'image sélectionnée
-        const tileMidX = Math.round(tileRect.left + tileRect.width / 2);
-        const tileMidY = Math.round(tileRect.top + tileRect.height / 2);
-
-        const editorRect = document.querySelector('.grid-container')?.getBoundingClientRect();
-
-        if (editorRect && tileMidY < Math.round(editorRect.bottom) && tileMidX > Math.round(editorRect.left) && tileMidX < Math.round(editorRect.right)) {
+      const editorRect = document.querySelector('.grid-container')?.getBoundingClientRect();
+      const mouseX = event.clientX;
+      const mouseY = event.clientY;
+      if (editorRect) {
+        if (
+          mouseX >= editorRect.left &&
+          mouseX <= editorRect.right &&
+          mouseY >= editorRect.top &&
+          mouseY <= editorRect.bottom
+        ) {
           this.onEditor = true;
-
         } else {
           this.onEditor = false;
         }
       }
+      console.log(this.onEditor);
+
       if (this.isTileClicked && this.activeTileIndex !== null) {
         const tileMidX = this.tiles[this.activeTileIndex].x + (75);
         const tileMidY = this.tiles[this.activeTileIndex].y + (75);
@@ -104,13 +105,16 @@ export default {
       }
     },
     handleClickWin(event: any) {
-      if (this.isTileClicked && this.counter === 2 ) {
+      if (this.isTileClicked && this.counter === 2) {
         this.isTileClicked = false;
         this.activeTileIndex = null;
         this.counter = 0;
-        console.log('je delete la tile');
-      } else {
-        console.log('R A S');
+        console.log('je delete la tile car je suis ailleur');
+      } else if (this.onEditor && this.isTileClicked) {
+        console.log('je delete la tile car je suis sur leditor');
+        this.isTileClicked = false;
+        this.activeTileIndex = null;
+        this.counter = 0;
       }
     }
   },
@@ -135,7 +139,7 @@ export default {
   </div>
   <div class="container tiles-container">
     <img class="tile" v-for="(tile, index) in tiles" :key="index" :src="tile.url" :alt="tile.alt"
-    @click="handleClick(index, $event)"
+      @click="handleClick(index, $event)"
       :style="{ position: isTileClicked && activeTileIndex === index ? 'absolute' : 'static', left: tile.x + 'px', top: tile.y + 'px', display: activeTileIndex === index && onEditor === true ? 'none' : 'block' }" />
   </div>
   <!-- pointerEvents: isTileClicked ? 'none' : 'auto' -->

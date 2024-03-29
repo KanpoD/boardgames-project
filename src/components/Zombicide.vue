@@ -101,29 +101,30 @@ const handleZoom = (event: WheelEvent) => {
   scale.value = newScale;
 };
 
-const handleCellClick = (cell: HTMLElement) => {
-  let rotationDegree = 0;
+let rotationDegree = 0;
 
-  cell.addEventListener('click', () => {
-    if (selectedTileImage.value) {
-      const imagePath = `url(${selectedTileImage.value.url})`;
-      cell.style.backgroundImage = imagePath;
-      selectedTileImage.value = null;
-    } else if (cell.style.backgroundImage !== 'none') {
-      rotationDegree += 90;//Changer ça tard plus
-      cell.style.transform = `rotate(${rotationDegree}deg)`;
-    }
-  });
+const handleCellClick = (cell: HTMLElement) => {
+
+  if (selectedTileImage.value) {
+    const imagePath = `url(${selectedTileImage.value.url})`;
+    cell.style.backgroundImage = imagePath;
+    selectedTileImage.value = null;
+    console.log("Je clique");
+  } else if (selectedTileImage.value === null) {
+    console.log("Je rotate");
+    rotationDegree += 90;
+    cell.style.transform = `rotate(${rotationDegree}deg)`;
+  }
 };
 
 const handleGridHover = (row: number, column: number) => {
   const cell = document.querySelector(`.grid-item[row="${row}"][column="${column}"]`) as HTMLElement;
 
+
   if (cell && selectedTileImage.value) {
-    console.log(row, column);
     const imagePath = `url(${selectedTileImage.value.url})`;
     let isBkSet = selectedTileImage.value.backgroundSet;
-    console.log(isBkSet);
+
 
     if (!isBkSet) {
       cell.style.backgroundImage = imagePath;
@@ -134,8 +135,6 @@ const handleGridHover = (row: number, column: number) => {
         cell.style.backgroundImage = 'none';
       }
     });
-
-    handleCellClick(cell);
   }
 };
 </script>
@@ -156,13 +155,19 @@ const handleGridHover = (row: number, column: number) => {
             :style="{ transform: `translate(${translateX}px, ${translateY}px) scale(${scale})` }">
             <div class="grid-row" v-for="row in 12" :key="row">
               <div class="grid-item" v-for="column in 12" :key="column" :row="row" :column="column"
-                :style="{ 'background-image': 'none' }" @mousemove="handleGridHover(row, column)">
+                :style="{ 'background-image': 'none' }" @mousemove="handleGridHover(row, column)"
+                @click="handleCellClick($event.target)">
               </div>
             </div>
           </div>
         </div>
         <div class="bot-content">
           <div class="bot-panel">
+            <div>
+              <i class='bx bx-move'></i>
+              <i class='bx bx-trash'></i>
+              <i class='bx bx-rotate-right'></i>
+            </div>
           </div>
         </div>
       </div>
