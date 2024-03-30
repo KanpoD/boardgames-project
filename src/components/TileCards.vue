@@ -91,7 +91,6 @@ export default {
           this.onEditor = false;
         }
       }
-      console.log(this.onEditor);
 
       if (this.isTileClicked && this.activeTileIndex !== null) {
         const tileMidX = this.tiles[this.activeTileIndex].x + (75);
