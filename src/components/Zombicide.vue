@@ -8,6 +8,14 @@ interface TileObject {
   backgroundSet: boolean;
 }
 
+// interface GridDataItem {
+//   row: number;
+//   column: number;
+//   url: string;
+// }
+
+// const gridData: GridDataItem[] = [];
+
 let selectedTileImage = ref<TileObject | null>(null);
 
 const handleTileSelected = (tileObject: {
@@ -21,10 +29,10 @@ const handleTileSelected = (tileObject: {
     "isTileClicked" in tileObject &&
     "backgroundSet" in tileObject
   ) {
-    
+
     selectedTileImage.value = tileObject;
     tileObject.isTileClicked = false;
-    console.log(selectedTileImage.value?.url);
+    console.log(`"${selectedTileImage.value?.url}"`);
     handleTool('place');
   }
 };
@@ -45,11 +53,13 @@ let remove = false;
 let rotate = false;
 let place = false;
 let activeTool = "";
+let selectedTool = "";
 
 function handleTool(tool: string) {
-  console.log(tool);
-  activeTool = tool;
 
+  activeTool = tool;
+  selectedTool = tool;
+  console.log(selectedTool);
   switch (tool) {
     case "move":
       move = true;
@@ -140,7 +150,6 @@ const handleZoom = (event: WheelEvent) => {
   } else {
     newScale -= zoomStep;
   }
-
   if (newScale > maxZoom) {
     newScale = maxZoom;
   } else if (newScale < minZoom) {
@@ -151,17 +160,17 @@ const handleZoom = (event: WheelEvent) => {
 
 let rotationDegree = 0;
 
-const handleCellClick = (cell: HTMLElement | null) => {
+const handleCellClick = (cell: HTMLElement | null, row: number, column: number) => {
   if (!cell) return;
-
   if (selectedTileImage.value && activeTool === "place") {
     const imagePath = `url(${selectedTileImage.value.url})`;
+    // gridData.push({ row: row, column: column, url: imagePath });
     cell.style.backgroundImage = imagePath;
     selectedTileImage.value = null;
-    console.log("Je clique");
+    // console.log("Je clique " + gridData);
   } else if (selectedTileImage.value === null && activeTool === "move") {
-    // selectedTileImage.value = tileObject;
-    console.log(selectedTileImage.value?.url)
+    const imagePath = `url(${cell.style.backgroundImage})`;
+    console.log(imagePath);
   } else if (selectedTileImage.value === null && activeTool === "rotate") {
     console.log("Je rotate");
     rotationDegree += 90;
@@ -178,22 +187,29 @@ const handleGridHover = (row: number, column: number) => {
   const cell = document.querySelector(
     `.grid-item[row="${row}"][column="${column}"]`
   ) as HTMLElement;
-
+  let backgroundBackup = cell.style.backgroundImage;
+  console.log("backgroundBackup = " + backgroundBackup)
+  //Si cell existe et que une tile est selectionée
   if (cell && selectedTileImage.value) {
-    const imagePath = `url(${selectedTileImage.value.url})`;
-    let isBkSet = selectedTileImage.value.backgroundSet;
 
-    if (!isBkSet) {
-      cell.style.backgroundImage = imagePath;
-    }
+    const imagePath = `url("${selectedTileImage.value?.url}")`;//Recuprer l'url de l'image selectionée
+    // let isBkSet = selectedTileImage.value.backgroundSet;
+    cell.style.backgroundImage = imagePath;
+
+    cell.addEventListener("click", () => {
+      backgroundBackup = imagePath;
+    });
+
 
     cell.addEventListener("mouseleave", () => {
-      if (selectedTileImage.value && !selectedTileImage.value.backgroundSet) {
-        cell.style.backgroundImage = "none";
-      }
+      if (activeTool !== 'remove')
+        cell.style.backgroundImage = backgroundBackup;
     });
   }
 };
+
+
+
 </script>
 
 <template>
@@ -206,40 +222,30 @@ const handleGridHover = (row: number, column: number) => {
         </div>
       </div>
       <div class="right-content">
-        <div
-          class="right-panel"
-          ref="rightPanel"
-          @mousedown="startDrag"
-          @mousemove="drag"
-          @mouseup="endDrag"
-          @wheel="handleZoom"
-        >
-          <div
-            class="grid-container"
-            :style="{
-              transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
-            }"
-          >
-            <div class="grid-row" v-for="row in 12" :key="row">
-              <div
-                class="grid-item"
-                v-for="column in 12"
-                :key="column"
-                :row="row"
-                :column="column"
-                :style="{ 'background-image': 'none' }"
-                @mousemove="handleGridHover(row, column)"
-                @click="handleCellClick($event.target)"
-              ></div>
+        <div class="right-panel" ref="rightPanel" @mousedown="startDrag" @mousemove="drag" @mouseup="endDrag"
+          @wheel="handleZoom">
+          <div class="grid-container" :style="{
+            transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+          }">
+            <div class="grid-row" v-for="(row, rowIndex) in 12" :key="rowIndex">
+              <div class="grid-item" v-for="(column, columnIndex) in 12" :key="columnIndex" :row="rowIndex"
+                :column="columnIndex" :style="{ 'background-image': 'none' }"
+                @mouseenter="handleGridHover(rowIndex, columnIndex)"
+                @click="handleCellClick($event.target, rowIndex, columnIndex)">
+              </div>
+
             </div>
           </div>
         </div>
         <div class="bot-content">
           <div class="bot-panel">
             <div class="tools_wrappper">
-              <i class="bx bx-move" @click="handleTool('move')"></i>
-              <i class="bx bx-trash" @click="handleTool('remove')"></i>
-              <i class="bx bx-rotate-right" @click="handleTool('rotate')"></i>
+              <i class="bx bx-move" @click="handleTool('move')"
+                :class="{ 'selectedTool': selectedTool === 'move' }"></i>
+              <i class="bx bx-trash" @click="handleTool('remove')"
+                :class="{ 'selectedTool': selectedTool === 'remove' }"></i>
+              <i class="bx bx-rotate-right" @click="handleTool('rotate')"
+                :class="{ 'selectedTool': selectedTool === 'rotate' }"></i>
             </div>
           </div>
         </div>
@@ -262,7 +268,7 @@ const handleGridHover = (row: number, column: number) => {
   width: 95%;
   height: 80vh;
   display: flex;
-  box-shadow: 2px 2px 20px grey;
+  box-shadow: 2px 2px 20px #000000;
   border-radius: 15px;
 }
 
@@ -274,7 +280,7 @@ const handleGridHover = (row: number, column: number) => {
 .bot-content {
   display: flex;
   height: 20%;
-  background-color: aqua;
+  background-color: #003049;
 }
 
 .right-content {
@@ -290,13 +296,13 @@ const handleGridHover = (row: number, column: number) => {
 .left-panel {
   width: 100%;
   height: 100%;
-  background-color: #a8a8a8;
+  background-color: #FCBF49;
 }
 
 .right-panel {
   width: 100%;
   height: 100%;
-  background-color: lightgray;
+  background-color: #D62828;
   overflow: hidden;
   cursor: grab;
   position: relative;
@@ -309,6 +315,22 @@ const handleGridHover = (row: number, column: number) => {
 }
 
 .tools_wrappper {
+  display: flex;
+  width: 25%;
+  height: 100%;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.tools_wrappper i {
+  font-size: 4em;
+  color: white;
+  cursor: pointer;
+}
+
+.selectedTool {
+  border: 4px solid white;
+  border-radius: 15px;
 }
 
 .grid-container {
