@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { jsPDF } from "jspdf";
+
+
+
+
 let symbolsByCard: number;
 const symbolsAmount = ref(0);
 const images = ref([]);
@@ -7,7 +12,6 @@ const isValid = ref(false);
 const hideParams = ref(false);
 
 function onSymbolAmountChange(value :any) {
-    console.log(this.symbolsByCard);
     let n = symbolsByCard - 1;
     this.symbolsAmount = n * n + n + 1; 
 }
@@ -24,7 +28,6 @@ function createImage(files: any) {
     var reader = new FileReader();
     reader.onload = function(event) {
         const imageUrl = event.target.result;
-        console.log(imageUrl);
         vm.images.push(imageUrl);
         if (vm.images.length === vm.symbolsAmount) {
             vm.isValid = true;
@@ -36,11 +39,20 @@ function createImage(files: any) {
 }
 
 function removeImage(index) {
-    this.images.splice(index, 1)
+    this.images.splice(index, 1);
 }
 
 function submit() {
-    this.hideParams = true;
+    // this.hideParams = true;
+    var doc = new jsPDF();
+
+    doc.html(document.getElementById('listImages').innerHTML, {
+        callback: function (doc) {
+            doc.save();
+        },
+        x: 10,
+        y: 10
+    });
 }
 </script>
 
@@ -67,12 +79,13 @@ function submit() {
         <button class="submit" :class="isValid ? '' : 'hideSubmit'" @click="submit()">Valider</button>
         <div>Glissez ou déposez vos fichier png</div>
         <input multiple type="file"  @change="onFileChange($event)">
-        <div class="img-list-container" v-if="images">
+        <div id="listImages" class="img-list-container" v-if="images">
             <div v-for="(image, index) in images" class="image">
                 <img class="image-file" :src="image" />
                 <button class="img-remover" @click="removeImage(index)">Remove image</button>
             </div>
         </div>
+        <div id="print-btn"></div>
     </div>
   </div>
 </template>
