@@ -58,7 +58,14 @@ let selectedTool = "";
 function handleTool(tool: string) {
 
   activeTool = tool;
+
+  move = (tool === 'move');
+  remove = (tool === 'remove');
+  rotate = (tool === 'rotate');
+  place = (tool === 'place');
+
   selectedTool = tool;
+
   console.log(selectedTool);
   switch (tool) {
     case "move":
@@ -87,6 +94,7 @@ function handleTool(tool: string) {
       break;
     default:
       activeTool = "";
+      selectedTool = "";
       break;
   }
 }
@@ -160,7 +168,7 @@ const handleZoom = (event: WheelEvent) => {
 
 let rotationDegree = 0;
 
-const handleCellClick = (cell: HTMLElement | null, row: number, column: number) => {
+const handleCellClick = (cell: HTMLElement | null) => {
   if (!cell) return;
   if (selectedTileImage.value && activeTool === "place") {
     const imagePath = `url(${selectedTileImage.value.url})`;
@@ -209,7 +217,6 @@ const handleGridHover = (row: number, column: number) => {
 };
 
 
-
 </script>
 
 <template>
@@ -239,13 +246,10 @@ const handleGridHover = (row: number, column: number) => {
         </div>
         <div class="bot-content">
           <div class="bot-panel">
-            <div class="tools_wrappper">
-              <i class="bx bx-move" @click="handleTool('move')"
-                :class="{ 'selectedTool': selectedTool === 'move' }"></i>
-              <i class="bx bx-trash" @click="handleTool('remove')"
-                :class="{ 'selectedTool': selectedTool === 'remove' }"></i>
-              <i class="bx bx-rotate-right" @click="handleTool('rotate')"
-                :class="{ 'selectedTool': selectedTool === 'rotate' }"></i>
+            <div class="tools_wrapper">
+              <i class="bx bx-move" @click="handleTool('move')" :class="{ 'selectedTool': selectedTool === 'move' }"></i>
+              <i class="bx bx-trash" @click="handleTool('remove')" :class="{ 'selectedTool': selectedTool === 'remove' }"></i>
+              <i class="bx bx-rotate-right" @click="handleTool('rotate')" :class="{ 'selectedTool': selectedTool === 'rotate' }"></i>
             </div>
           </div>
         </div>
@@ -314,7 +318,7 @@ const handleGridHover = (row: number, column: number) => {
   height: 100%;
 }
 
-.tools_wrappper {
+.tools_wrapper {
   display: flex;
   width: 25%;
   height: 100%;
@@ -322,7 +326,7 @@ const handleGridHover = (row: number, column: number) => {
   justify-content: space-around;
 }
 
-.tools_wrappper i {
+.tools_wrapper i {
   font-size: 4em;
   color: white;
   cursor: pointer;
