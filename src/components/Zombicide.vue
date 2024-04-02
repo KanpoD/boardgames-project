@@ -1,6 +1,33 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import TileCards from './TileCards.vue';
+import { ref } from "vue";
+import TileCards from "./TileCards.vue";
+
+interface TileObject {
+  url: string;
+  isTileClicked: boolean;
+  backgroundSet: boolean;
+}
+
+let selectedTileImage = ref<TileObject | null>(null);
+
+const handleTileSelected = (tileObject: {
+  url: string;
+  isTileClicked: boolean;
+  backgroundSet: boolean;
+
+}) => {
+  if (
+    "url" in tileObject &&
+    "isTileClicked" in tileObject &&
+    "backgroundSet" in tileObject
+  ) {
+    
+    selectedTileImage.value = tileObject;
+    tileObject.isTileClicked = false;
+    console.log(selectedTileImage.value?.url);
+    handleTool('place');
+  }
+};
 const scale = ref(1);
 const rightPanel = ref<HTMLElement | null>(null);
 let isDragging = false;
@@ -11,7 +38,48 @@ let translateY = ref(0);
 let maxTranslateX = ref(400);
 let maxTranslateY = ref(400);
 let minTranslateX = ref(-400);
-let minTranslateY = ref(-1000);//revoir les valeurs ici, peut etre les changer en fonction du scale ?
+let minTranslateY = ref(-1000); //revoir les valeurs ici, peut etre les changer en fonction du scale ?
+
+let move = false;
+let remove = false;
+let rotate = false;
+let place = false;
+let activeTool = "";
+
+function handleTool(tool: string) {
+  console.log(tool);
+  activeTool = tool;
+
+  switch (tool) {
+    case "move":
+      move = true;
+      remove = false;
+      rotate = false;
+      place = false;
+      break;
+    case "remove":
+      move = false;
+      remove = true;
+      rotate = false;
+      place = false;
+      break;
+    case "rotate":
+      move = false;
+      remove = false;
+      rotate = true;
+      place = false;
+      break;
+    case "place":
+      move = false;
+      remove = false;
+      rotate = false;
+      place = true;
+      break;
+    default:
+      activeTool = "";
+      break;
+  }
+}
 
 const startDrag = (event: MouseEvent) => {
   isDragging = true;
@@ -22,8 +90,7 @@ const startDrag = (event: MouseEvent) => {
 const drag = (event: MouseEvent) => {
   if (!isDragging) {
     return;
-  }
-  else if (isDragging) {
+  } else if (isDragging) {
     const deltaX = event.clientX - startX;
     const deltaY = event.clientY - startY;
     let newTranslateX = translateX.value + deltaX;
@@ -53,8 +120,6 @@ const drag = (event: MouseEvent) => {
     startX = event.clientX;
     startY = event.clientY;
   }
-
-
 };
 
 const endDrag = () => {
@@ -62,7 +127,7 @@ const endDrag = () => {
 };
 
 const handleZoom = (event: WheelEvent) => {
-  event.preventDefault();//désactive le scroll
+  event.preventDefault(); //désactive le scroll
   const delta = event.deltaY;
   const zoomStep = 0.1;
   const maxZoom = 1.9;
@@ -83,6 +148,52 @@ const handleZoom = (event: WheelEvent) => {
   }
   scale.value = newScale;
 };
+
+let rotationDegree = 0;
+
+const handleCellClick = (cell: HTMLElement | null) => {
+  if (!cell) return;
+
+  if (selectedTileImage.value && activeTool === "place") {
+    const imagePath = `url(${selectedTileImage.value.url})`;
+    cell.style.backgroundImage = imagePath;
+    selectedTileImage.value = null;
+    console.log("Je clique");
+  } else if (selectedTileImage.value === null && activeTool === "move") {
+    // selectedTileImage.value = tileObject;
+    console.log(selectedTileImage.value?.url)
+  } else if (selectedTileImage.value === null && activeTool === "rotate") {
+    console.log("Je rotate");
+    rotationDegree += 90;
+    cell.style.transform = `rotate(${rotationDegree}deg)`;
+  } else if (selectedTileImage.value === null && activeTool === "remove") {
+    console.log("Je supprime");
+    cell.style.backgroundImage = "none";
+  } else {
+    console.log("Aucun outil sélectionné ou action non prise en charge.");
+  }
+};
+
+const handleGridHover = (row: number, column: number) => {
+  const cell = document.querySelector(
+    `.grid-item[row="${row}"][column="${column}"]`
+  ) as HTMLElement;
+
+  if (cell && selectedTileImage.value) {
+    const imagePath = `url(${selectedTileImage.value.url})`;
+    let isBkSet = selectedTileImage.value.backgroundSet;
+
+    if (!isBkSet) {
+      cell.style.backgroundImage = imagePath;
+    }
+
+    cell.addEventListener("mouseleave", () => {
+      if (selectedTileImage.value && !selectedTileImage.value.backgroundSet) {
+        cell.style.backgroundImage = "none";
+      }
+    });
+  }
+};
 </script>
 
 <template>
@@ -91,21 +202,45 @@ const handleZoom = (event: WheelEvent) => {
     <div class="content-container">
       <div class="left-panel">
         <div class="elements">
-          <TileCards />
+          <TileCards @tile-selected="handleTileSelected" />
         </div>
       </div>
       <div class="right-content">
-        <div class="right-panel" ref="rightPanel" @mousedown="startDrag" @mousemove="drag" @mouseup="endDrag"
-          @wheel="handleZoom">
-          <div class="grid-container"
-            :style="{ transform: `translate(${translateX}px, ${translateY}px) scale(${scale})` }">
+        <div
+          class="right-panel"
+          ref="rightPanel"
+          @mousedown="startDrag"
+          @mousemove="drag"
+          @mouseup="endDrag"
+          @wheel="handleZoom"
+        >
+          <div
+            class="grid-container"
+            :style="{
+              transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+            }"
+          >
             <div class="grid-row" v-for="row in 12" :key="row">
-              <div class="grid-item" v-for="column in 12" :key="column"></div>
+              <div
+                class="grid-item"
+                v-for="column in 12"
+                :key="column"
+                :row="row"
+                :column="column"
+                :style="{ 'background-image': 'none' }"
+                @mousemove="handleGridHover(row, column)"
+                @click="handleCellClick($event.target)"
+              ></div>
             </div>
           </div>
         </div>
         <div class="bot-content">
           <div class="bot-panel">
+            <div class="tools_wrappper">
+              <i class="bx bx-move" @click="handleTool('move')"></i>
+              <i class="bx bx-trash" @click="handleTool('remove')"></i>
+              <i class="bx bx-rotate-right" @click="handleTool('rotate')"></i>
+            </div>
           </div>
         </div>
       </div>
@@ -144,6 +279,7 @@ const handleZoom = (event: WheelEvent) => {
 
 .right-content {
   display: flex;
+  width: 70%;
   flex-direction: column;
 }
 
@@ -166,11 +302,17 @@ const handleZoom = (event: WheelEvent) => {
   position: relative;
 }
 
-.bot-panel {}
+.bot-panel {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.tools_wrappper {
+}
 
 .grid-container {
   display: grid;
-
 }
 
 .grid-row {
@@ -182,5 +324,9 @@ const handleZoom = (event: WheelEvent) => {
   border: 1px solid black;
   width: 100px;
   height: 100px;
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  z-index: 2;
 }
 </style>
