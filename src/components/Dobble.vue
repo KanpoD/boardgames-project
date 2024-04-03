@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { jsPDF } from "jspdf";
-
+import html2pdf from "html2pdf.js";
+import DobbleCard from "./DobbleCard.vue";
 
 
 
@@ -10,6 +10,7 @@ const symbolsAmount = ref(0);
 const images = ref([]);
 const isValid = ref(false);
 const hideParams = ref(false);
+const dobbleCards = ref([]);
 
 function onSymbolAmountChange(value :any) {
     let n = symbolsByCard - 1;
@@ -28,9 +29,11 @@ function createImage(files: any) {
     var reader = new FileReader();
     reader.onload = function(event) {
         const imageUrl = event.target.result;
-        vm.images.push(imageUrl);
-        if (vm.images.length === vm.symbolsAmount) {
-            vm.isValid = true;
+        if (vm.images.indexOf(imageUrl) == -1){
+            vm.images.push(imageUrl);
+            if (vm.images.length === vm.symbolsAmount) {
+                vm.isValid = true;
+            }
         }
     }
     reader.readAsDataURL(files[index]);
@@ -43,21 +46,44 @@ function removeImage(index) {
 }
 
 function submit() {
-    // this.hideParams = true;
-    var doc = new jsPDF();
+    
+    // To do : Générer la liste
 
-    doc.html(document.getElementById('listImages').innerHTML, {
-        callback: function (doc) {
-            doc.save();
-        },
-        x: 10,
-        y: 10
-    });
+    let cards = [];
+    let n = this.symbolsByCard - 1;
+
+    for (let i = 0; i < n + 1; i++) {
+        cards.push([1]);
+        for (let j = 0; j < n; j++) {
+            cards[i].push((j+1) + (i*n) +1);
+        }
+    }
+    for (let i = 0; i < n ; i++) {
+        for (let j = 0; j < n; j++) {
+            cards.push([i + 2]);
+            for (let k = 0; k < n; k++) {
+                let val = (n+1 + n*k + (i*k+j)%n)+1;
+                cards[cards.length-1].push(val);
+            } 
+        }
+    }
+    for (let i = 0; i < cards.length ; i++) {
+        let currCard = [];
+        for (let j = 0; j < n + 1; j++) {
+            currCard.push(this.images[cards[i][j] - 1 ]);
+        }
+        this.dobbleCards.push(currCard);
+    }
+
+
+    //Export en PDF
+    let elem = document.getElementById('dobbleCardsID');
+    html2pdf().from(elem).save();
 }
 </script>
 
 <template>
-  <h2 class="title">Editeur de Dobble</h2>
+  <h2 id="titre" class="title">Editeur de Dobble</h2>
   <div class="generation-container" :class="hideParams ? 'hideParams' : ''">
     <div class="params-container">
         <h3>Combien de symboles par carte souhaitez-vous ?</h3>
@@ -88,13 +114,19 @@ function submit() {
         <div id="print-btn"></div>
     </div>
   </div>
+  <div class="dobbleCards-container">
+    <div id="dobbleCardsID" class="dobbleCards">
+        <DobbleCard class="" v-for="card in dobbleCards" :symbolNumber="symbolsByCard" :urls="card"/>
+    </div>
+  </div>
 </template>
 
 <style>
 .img-list-container {
     margin: 3rem auto;
-    display: block;
-    max-width: 70%;
+    display: flex;
+    max-width: 80%;
+    overflow: scroll;
 }
 
 .image {
@@ -120,5 +152,12 @@ function submit() {
 
 .hideParams {
     display: none;
+}
+
+.dobbleCards {
+    display: flex;
+    width: 80%;
+    overflow: scroll;
+    margin: 3rem auto;
 }
 </style>
