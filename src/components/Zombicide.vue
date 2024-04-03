@@ -1,39 +1,37 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import TileCards from "./TileCards.vue";
 
 interface TileObject {
   url: string;
-  isTileClicked: boolean;
-  backgroundSet: boolean;
+  elementTypes: string;
 }
-
-// interface GridDataItem {
-//   row: number;
-//   column: number;
-//   url: string;
-// }
-
-// const gridData: GridDataItem[] = [];
 
 let selectedTileImage = ref<TileObject | null>(null);
 
-const handleTileSelected = (tileObject: {
-  url: string;
-  isTileClicked: boolean;
-  backgroundSet: boolean;
+let elementTypeSelected = "";
 
-}) => {
-  if (
-    "url" in tileObject &&
-    "isTileClicked" in tileObject &&
-    "backgroundSet" in tileObject
-  ) {
-
+const handleTileSelected = (
+  tileObject: {
+    url: string;
+    elementTypes: string;
+  },
+  elementType: string
+) => {
+  console.log(elementType);
+  if ("url" in tileObject && elementType === "tile") {
     selectedTileImage.value = tileObject;
-    tileObject.isTileClicked = false;
-    console.log(`"${selectedTileImage.value?.url}"`);
-    handleTool('place');
+    handleTool("place");
+  } else if ("url" in tileObject && elementType === "token") {
+    selectedTileImage.value = tileObject;
+    handleTool("place");
+  }
+  if (elementType === "token") {
+    tokenGrid.classList.add("tokenClicked");
+    console.log("Je rajoute une class tokenClicked a : " + elementType);
+  } else if (elementType === "tile") {
+    tileGrid.classList.add("tileClicked");
+    console.log("Je rajoute une class tileClicked a : " + elementType);
   }
 };
 const scale = ref(1);
@@ -53,20 +51,10 @@ let remove = false;
 let rotate = false;
 let place = false;
 let activeTool = "";
-let selectedTool = "";
 
-function handleTool(tool: string) {
-
+const handleTool = (tool: string) => {
   activeTool = tool;
 
-  move = (tool === 'move');
-  remove = (tool === 'remove');
-  rotate = (tool === 'rotate');
-  place = (tool === 'place');
-
-  selectedTool = tool;
-
-  console.log(selectedTool);
   switch (tool) {
     case "move":
       move = true;
@@ -94,10 +82,9 @@ function handleTool(tool: string) {
       break;
     default:
       activeTool = "";
-      selectedTool = "";
       break;
   }
-}
+};
 
 const startDrag = (event: MouseEvent) => {
   isDragging = true;
@@ -178,45 +165,68 @@ const handleCellClick = (cell: HTMLElement | null) => {
     // console.log("Je clique " + gridData);
   } else if (selectedTileImage.value === null && activeTool === "move") {
     const imagePath = `url(${cell.style.backgroundImage})`;
-    console.log(imagePath);
   } else if (selectedTileImage.value === null && activeTool === "rotate") {
-    console.log("Je rotate");
     rotationDegree += 90;
     cell.style.transform = `rotate(${rotationDegree}deg)`;
   } else if (selectedTileImage.value === null && activeTool === "remove") {
-    console.log("Je supprime");
     cell.style.backgroundImage = "none";
   } else {
     console.log("Aucun outil sélectionné ou action non prise en charge.");
   }
+  handleState();
+};
+
+const handleState = () => {
+  console.log(elementTypeSelected);
+  if (elementTypeSelected === "token") {
+    tokenGrid.classList.remove("tokenClicked");
+    console.log("je rajoute la classe tokenCliked");
+  } else if (elementTypeSelected === "tile") {
+    tileGrid.classList.remove("tileClicked");
+    console.log("je rajoute la classe tileClicked");
+  }
 };
 
 const handleGridHover = (row: number, column: number) => {
-  const cell = document.querySelector(
-    `.grid-item[row="${row}"][column="${column}"]`
-  ) as HTMLElement;
-  let backgroundBackup = cell.style.backgroundImage;
-  console.log("backgroundBackup = " + backgroundBackup)
+  let cell: HTMLElement | null = null;
+  if (elementTypeSelected === "tile") {
+    cell = document.querySelector(
+      `.grid-item[row="${row}"][column="${column}"]`
+    ) as HTMLElement | null;
+  } else if (elementTypeSelected === "token") {
+    cell = document.querySelector(
+      `.grid-item-token[row="${row}"][column="${column}"]`
+    ) as HTMLElement | null;
+  }
+
+  let backgroundBackup = cell?.style.backgroundImage;
   //Si cell existe et que une tile est selectionée
   if (cell && selectedTileImage.value) {
-
-    const imagePath = `url("${selectedTileImage.value?.url}")`;//Recuprer l'url de l'image selectionée
-    // let isBkSet = selectedTileImage.value.backgroundSet;
+    const imagePath = `url("${selectedTileImage.value?.url}")`; //Recuprer l'url de l'image selectionée
     cell.style.backgroundImage = imagePath;
 
     cell.addEventListener("click", () => {
       backgroundBackup = imagePath;
     });
 
-
     cell.addEventListener("mouseleave", () => {
-      if (activeTool !== 'remove')
+      if (activeTool !== "remove")
         cell.style.backgroundImage = backgroundBackup;
     });
   }
 };
 
+const toolSelected = ref("");
 
+const switchTool = (tool: string) => {
+  toolSelected.value = tool;
+};
+let tokenGrid: any;
+let tileGrid: any;
+onMounted(() => {
+  tokenGrid = document.querySelector(".grid-token-container");
+  tileGrid = document.querySelector(".grid-tile-container");
+});
 </script>
 
 <template>
@@ -229,27 +239,78 @@ const handleGridHover = (row: number, column: number) => {
         </div>
       </div>
       <div class="right-content">
-        <div class="right-panel" ref="rightPanel" @mousedown="startDrag" @mousemove="drag" @mouseup="endDrag"
-          @wheel="handleZoom">
-          <div class="grid-container" :style="{
-            transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
-          }">
-            <div class="grid-row" v-for="(row, rowIndex) in 12" :key="rowIndex">
-              <div class="grid-item" v-for="(column, columnIndex) in 12" :key="columnIndex" :row="rowIndex"
-                :column="columnIndex" :style="{ 'background-image': 'none' }"
-                @mouseenter="handleGridHover(rowIndex, columnIndex)"
-                @click="handleCellClick($event.target, rowIndex, columnIndex)">
+        <div
+          class="right-panel"
+          ref="rightPanel"
+          @mousedown="startDrag"
+          @mousemove="drag"
+          @mouseup="endDrag"
+          @wheel="handleZoom"
+        >
+          <div
+            class="grid-container"
+            :style="{
+              transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+            }"
+          >
+            <div class="grid-tile-container">
+              <div
+                class="grid-row"
+                v-for="(row, rowIndex) in 12"
+                :key="rowIndex"
+              >
+                <div
+                  class="grid-item"
+                  v-for="(column, columnIndex) in 12"
+                  :key="columnIndex"
+                  :row="rowIndex"
+                  :column="columnIndex"
+                  :style="{ 'background-image': 'none' }"
+                  @mouseenter="handleGridHover(rowIndex, columnIndex)"
+                  @click="handleCellClick($event.target)"
+                ></div>
               </div>
-
+            </div>
+            <div class="grid-token-container">
+              <div
+                class="grid-row-token"
+                v-for="(row, rowIndex) in 24"
+                :key="rowIndex"
+              >
+                <div
+                  class="grid-item-token"
+                  v-for="(column, columnIndex) in 24"
+                  :key="columnIndex"
+                  :row="rowIndex"
+                  :column="columnIndex"
+                  :style="{
+                    'background-image': 'none',
+                  }"
+                  @mouseenter="handleGridHover(rowIndex, columnIndex)"
+                  @click="handleCellClick($event.target)"
+                ></div>
+              </div>
             </div>
           </div>
         </div>
         <div class="bot-content">
           <div class="bot-panel">
             <div class="tools_wrapper">
-              <i class="bx bx-move" @click="handleTool('move')" :class="{ 'selectedTool': selectedTool === 'move' }"></i>
-              <i class="bx bx-trash" @click="handleTool('remove')" :class="{ 'selectedTool': selectedTool === 'remove' }"></i>
-              <i class="bx bx-rotate-right" @click="handleTool('rotate')" :class="{ 'selectedTool': selectedTool === 'rotate' }"></i>
+              <i
+                class="bx bx-move"
+                @click="handleTool('move'), switchTool('move')"
+                :class="{ selectedTool: activeTool.value === 'move' }"
+              ></i>
+              <i
+                class="bx bx-trash"
+                @click="handleTool('remove'), switchTool('move')"
+                :class="{ selectedTool: activeTool.value === 'remove' }"
+              ></i>
+              <i
+                class="bx bx-rotate-right"
+                @click="handleTool('rotate'), switchTool('rotate')"
+                :class="{ selectedTool: activeTool.value === 'rotate' }"
+              ></i>
             </div>
           </div>
         </div>
@@ -298,15 +359,15 @@ const handleGridHover = (row: number, column: number) => {
 }
 
 .left-panel {
-  width: 100%;
+  width: 30%;
   height: 100%;
-  background-color: #FCBF49;
+  background-color: #fcbf49;
 }
 
 .right-panel {
   width: 100%;
   height: 100%;
-  background-color: #D62828;
+  background-color: #d62828;
   overflow: hidden;
   cursor: grab;
   position: relative;
@@ -337,22 +398,56 @@ const handleGridHover = (row: number, column: number) => {
   border-radius: 15px;
 }
 
+.unselectedTool {
+  border: none;
+}
+
 .grid-container {
   display: grid;
+  position: relative;
+}
+
+.grid-token-container {
+  position: absolute;
 }
 
 .grid-row {
   display: flex;
 }
 
+.grid-row-token {
+  display: flex;
+}
+
+.grid-item-token {
+  width: 50px;
+  height: 50px;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
 .grid-item {
   background-color: white;
-  border: 1px solid black;
+  border: 1px solid #d62828;
   width: 100px;
   height: 100px;
-
+  box-sizing: border-box;
   background-repeat: no-repeat;
   background-size: cover;
-  z-index: 2;
+}
+
+.grid-tile-container {
+  pointer-events: none;
+  /* z-index: 2; */
+}
+
+.grid-token-container {
+  pointer-events: none;
+  /* z-index: 3; */
+}
+
+.tileClicked,
+.tokenClicked {
+  pointer-events: auto;
 }
 </style>
