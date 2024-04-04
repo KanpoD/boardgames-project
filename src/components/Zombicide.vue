@@ -5,6 +5,7 @@ import TileCards from "./TileCards.vue";
 interface TileObject {
   url: string;
   elementTypes: string;
+  large: boolean;
 }
 
 let selectedTileImage = ref<TileObject | null>(null);
@@ -15,6 +16,7 @@ const handleTileSelected = (
   tileObject: {
     url: string;
     elementTypes: string;
+    large: boolean;
   },
   elementType: string
 ) => {
@@ -218,6 +220,7 @@ const handleGridHover = (row: number, column: number) => {
   }
 };
 
+
 let tokenGrid: any;
 let tileGrid: any;
 onMounted(() => {
@@ -342,6 +345,7 @@ onMounted(() => {
   flex-direction: column;
   box-shadow: 2px 2px 20px #000000;
   border-radius: 15px;
+  border: 1px solid grey;
   overflow: hidden;
 }
 
@@ -350,6 +354,7 @@ onMounted(() => {
   padding: 0;
   color: white;
   background-color: #003049;
+  border-bottom: 1px solid grey;
 }
 
 .wrapper {
@@ -366,6 +371,7 @@ onMounted(() => {
   display: flex;
   height: 20%;
   background-color: #003049;
+  border-top: 1px solid grey;
 }
 
 .right-content {
@@ -383,7 +389,8 @@ onMounted(() => {
 .left-panel {
   width: 30%;
   height: 100%;
-  background: linear-gradient(to top, #003049 10%, #f9ffcc, #003049 90%);
+  background: linear-gradient(to top, #003049 10%, #014163, #003049 90%);
+  border-right: 1px solid grey;
 }
 
 .right-panel {
@@ -403,18 +410,28 @@ onMounted(() => {
 
 .tools_wrapper {
   display: flex;
-  width: 25%;
   height: 100%;
   align-items: center;
-  justify-content: space-around;
+  width: 100%;
 }
 
 .tools_wrapper i {
-  font-size: 4em;
+  padding: .2em;
+  margin-left: 1em;
+  font-size: 2em;
   color: white;
   cursor: pointer;
+  border: 2px solid rgba(245, 245, 245, 0);
+  transition: all .3s ease;
 }
-
+.tools_wrapper i:hover{
+  border: 2px solid whitesmoke;
+  border-radius: 10px;
+}
+.tools_wrapper i:active{
+  border: 2px solid whitesmoke;
+  border-radius: 10px;
+}
 .selectedTool {
   border: 4px solid white;
   border-radius: 15px;
@@ -475,5 +492,11 @@ onMounted(() => {
 
 .element-selected {
   position: fixed;
+}
+
+.large-token {
+  width: 200%; /* Par exemple, un token large occupe deux fois la largeur d'un token normal */
+  height: 200%; /* Même hauteur que la largeur pour garder un aspect carré */
+  /* Ajoutez d'autres styles selon vos besoins */
 }
 </style>

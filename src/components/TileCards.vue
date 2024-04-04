@@ -1,6 +1,11 @@
 <script lang="ts">
+import InputText from "./InputText.vue";
+
 export default {
   emits: ["tile-selected"],
+  components: {
+    InputText, // Enregistrez le composant dans la vue parente
+  },
   data() {
     return {
       tiles: [
@@ -156,6 +161,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: true,
         },
         {
           url: "/src/assets/other-tokens/Car-PoliceCar.png",
@@ -163,6 +169,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: true,
         },
         {
           url: "/src/assets/other-tokens/Exit.png",
@@ -170,6 +177,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/other-tokens/Noise Token.png",
@@ -177,6 +185,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/other-tokens/Objective-Blue.png",
@@ -184,6 +193,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/other-tokens/Objective-Green.png",
@@ -191,6 +201,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/other-tokens/Objective-Red.png",
@@ -198,6 +209,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/other-tokens/Pimweapon Crate.png",
@@ -205,6 +217,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/other-tokens/Spawn-Blue.png",
@@ -212,6 +225,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/other-tokens/Spawn-Green.png",
@@ -219,6 +233,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/other-tokens/Spawn-Red.png",
@@ -226,6 +241,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/other-tokens/Spawn-StartingSpawn.png",
@@ -233,6 +249,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/other-tokens/Survivor Starting Zone.png",
@@ -240,6 +257,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/doors/Door-Closed-Blue.png",
@@ -247,6 +265,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/doors/Door-Closed-Green.png",
@@ -254,6 +273,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/doors/Door-Closed-Red.png",
@@ -261,6 +281,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/doors/Door-Open-Blue.png",
@@ -268,6 +289,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/doors/Door-Open-Green.png",
@@ -275,6 +297,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
         {
           url: "/src/assets/doors/Door-Open-Red.png",
@@ -282,6 +305,7 @@ export default {
           x: 0,
           y: 0,
           isTokenClicked: false,
+          large: false,
         },
       ],
       isTokenClicked: false,
@@ -291,18 +315,21 @@ export default {
       cursorOffsetY: 0,
       onEditor: false,
       counter: 0,
+      page: 1,
+      pageState: "Next",
+      iconDirection: "right",
+      initialText: 'Contenu initial du textarea...'
     };
   },
   methods: {
-    handleClick(Index: number, event: any, param: string) {
+    handleClick(Index: number, event: any, param: string, isLarge: boolean) {
       if (this.isTileClicked || this.isTokenClicked) {
         this.isTileClicked = false;
         this.isTokenClicked = false;
         this.activeTileIndex = null;
         // }
       } else {
-        
-        console.log('je suis' + [Index]);
+        console.log("je suis" + [Index]);
         if (param === "tile") {
           this.isTileClicked = true;
           this.activeTileIndex = Index;
@@ -314,7 +341,7 @@ export default {
             event.clientX - this.cursorOffsetX;
           this.tiles[this.activeTileIndex].y =
             event.clientY - this.cursorOffsetY;
-          this.$emit("tile-selected", this.tiles[Index], 'tile'); //Envoyer l'url au daron
+          this.$emit("tile-selected", this.tiles[Index], "tile", isLarge); //Envoyer l'url au daron
         } else if (param === "token") {
           this.isTokenClicked = true;
           this.activeTileIndex = Index;
@@ -326,7 +353,7 @@ export default {
             event.clientX - this.cursorOffsetX;
           this.tokens[this.activeTileIndex].y =
             event.clientY - this.cursorOffsetY;
-          this.$emit("tile-selected", this.tokens[Index], "token"); //Envoyer l'url au daron
+          this.$emit("tile-selected", this.tokens[Index], "token", isLarge); //Envoyer l'url au daron
         }
       }
     },
@@ -358,8 +385,7 @@ export default {
 
         this.tiles[this.activeTileIndex].x += offsetX;
         this.tiles[this.activeTileIndex].y += offsetY;
-      }else if (this.isTokenClicked && this.activeTileIndex !== null) {
-        
+      } else if (this.isTokenClicked && this.activeTileIndex !== null) {
         const tileMidX = this.tokens[this.activeTileIndex].x + 75;
         const tileMidY = this.tokens[this.activeTileIndex].y + 75;
 
@@ -370,16 +396,28 @@ export default {
         this.tokens[this.activeTileIndex].y += offsetY;
       }
     },
-    handleClickWin(event: any) {
-      console.log('mon isTokenClicked est : ' + this.isTokenClicked);
-     if (this.onEditor) {
+    handleClickWin() {
+      console.log("mon isTokenClicked est : " + this.isTokenClicked);
+      if (this.onEditor) {
         this.isTileClicked = false;
         this.isTokenClicked = false;
         this.activeTileIndex = null;
         this.counter = 0;
       }
     },
+    pagesToggle() {
+      if (this.page === 1) {
+        this.page = -1;
+        this.pageState = "Prev";
+        this.iconDirection = "left";
+      } else {
+        this.page = 1;
+        this.pageState = "Next";
+        this.iconDirection = "right";
+      }
+    },
   },
+
   mounted() {
     // activer la detection de la souris sur toute la fenetre
     window.addEventListener("mousemove", this.handleMouseMove);
@@ -395,54 +433,107 @@ export default {
 
 <template>
   <div class="left-container">
-    <div class="container tiles-container">
-      <img
-        class="tile"
-        v-for="(tile, index) in tiles"
-        :key="index"
-        :src="tile.url"
-        :alt="tile.alt"
-        @click="handleClick(index, $event, 'tile')"
-        :style="{
-          position:
-            isTileClicked && activeTileIndex === index ? 'absolute' : 'static',
-          left: tile.x + 'px',
-          top: tile.y + 'px',
-          display:
-            activeTileIndex === index && onEditor === true ? 'none' : 'block',
-        }"
-      />
+    <div class="page-btn" @click="pagesToggle()">
+      {{ pageState }} <i :class="'bx bxs-' + iconDirection + '-arrow'"></i>
     </div>
-    <!-- pointerEvents: isTileClicked ? 'none' : 'auto' -->
-    <div class="container tokens-container">
-      <img
-        class="token"
-        v-for="(token, index) in tokens"
-        :key="index"
-        :src="token.url"
-        :alt="token.alt"
-        @click="handleClick(index, $event, 'token')"
-        :style="{
-          position:
-            isTokenClicked && activeTileIndex === index ? 'absolute' : 'static',
-          left: token.x + 'px',
-          top: token.y + 'px',
-          display:
-            activeTileIndex === index && onEditor === true ? 'none' : 'block',
-        }"
-      />
+
+    <div>
+      <div
+        class="description-container"
+        :style="{ display: page === -1 ? 'block' : 'none' }"
+      >
+        <h2>Description :</h2>
+        <div>
+          <InputText/>
+        </div>
+
+        <div class="goal-container">
+          <h2>But de la partie :</h2>
+        </div>
+        <InputText/>
+      </div>
+    </div>
+
+    <div class="tile-page" :style="{ display: page === 1 ? 'block' : 'none' }">
+      <div class="container tiles-container">
+        <img
+          class="tile"
+          v-for="(tile, index) in tiles"
+          :key="index"
+          :src="tile.url"
+          :alt="tile.alt"
+          @click="handleClick(index, $event, 'tile')"
+          :style="{
+            position:
+              isTileClicked && activeTileIndex === index
+                ? 'absolute'
+                : 'static',
+            left: tile.x + 'px',
+            top: tile.y + 'px',
+            display:
+              activeTileIndex === index && onEditor === true ? 'none' : 'block',
+          }"
+        />
+      </div>
+      <!-- pointerEvents: isTileClicked ? 'none' : 'auto' -->
+      <div class="container tokens-container">
+        <img
+          class="token"
+          v-for="(token, index) in tokens"
+          :key="index"
+          :src="token.url"
+          :alt="token.alt"
+          @click="handleClick(index, $event, 'token', token.large)"
+          :style="{
+            position:
+              isTokenClicked && activeTileIndex === index
+                ? 'absolute'
+                : 'static',
+            left: token.x + 'px',
+            top: token.y + 'px',
+            display:
+              activeTileIndex === index && onEditor === true ? 'none' : 'block',
+          }"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <style>
 .left-container {
+  position: relative;
   overflow: hidden;
   height: 100%;
 }
 
+.page-btn {
+  position: absolute;
+  display: flex;
+  justify-content: space-around;
+  height: 10%;
+  width: 100%;
+  align-items: center;
+  right: 0;
+  bottom: 0;
+  color: whitesmoke;
+  background-color: #002f4970;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.tile-page {
+  height: 100%;
+}
+
 .container {
+  height: 100%;
   overflow: auto;
+}
+
+.description-container{
+  height: 550px;
+  overflow-y: scroll;
 }
 
 .title-container {
@@ -455,7 +546,7 @@ export default {
   flex-wrap: wrap;
   justify-content: center;
   height: 60%;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid grey;
   overflow-x: hidden;
 }
 
@@ -464,15 +555,13 @@ export default {
   flex-wrap: wrap;
   justify-content: center;
   height: 35%;
-  overflow: auto;
+  overflow: scroll;
 }
 
 .tokens-container img {
-  width: 100%;
-  height: 100%;
   object-fit: contain;
-  max-height: 25%;
-  max-width: 15%;
+  max-height: 45%;
+  max-width: 25%;
 }
 
 .tile {

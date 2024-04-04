@@ -60,28 +60,25 @@ h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
+h2{
+  color: white;
+}
 
 ::-webkit-scrollbar {
-  width: 8px; /* Largeur de la barre de défilement */
+  width: 6px; /* Largeur de la barre de défilement */
 }
 
 ::-webkit-scrollbar-track {
-  background: rgb(1 2 3 / 40%); /* Dégradé de couleur pour l'arrière-plan */
+  background: rgba(255, 255, 255, 0.221); /* Dégradé de couleur pour l'arrière-plan */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(
-    0,
-    0,
-    0,
-    0.2
-  ); /* Couleur de la poignée de la barre de défilement */
+  background: rgba(0, 0, 0, 0.593); /* Couleur de la poignée de la barre de défilement */
   border-radius: 4px; /* Arrondi de la poignée */
 }
 
-/* Barre de défilement horizontale */
 ::-webkit-scrollbar-horizontal {
-  height: 8px; /* Hauteur de la barre de défilement horizontale */
+  height: 6px;
 }
 
 ::-webkit-scrollbar-thumb:horizontal {
@@ -92,6 +89,25 @@ h1 {
     0.2
   ); /* Couleur de la poignée de la barre de défilement horizontale */
   border-radius: 4px; /* Arrondi de la poignée */
+}
+
+textarea{  
+  display: block;
+  box-sizing: padding-box;
+  overflow: hidden;
+
+  padding: 10px;
+  width: 250px;
+  font-size: 14px;
+  margin: 50px auto;
+  border-radius: 6px;
+  box-shadow: 2px 2px 8px rgba(black, .3);
+  border: 0;
+  
+  &:focus{
+    border: none;
+    outline: none;
+  }
 }
 
 button {
