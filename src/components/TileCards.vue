@@ -517,6 +517,7 @@ export default {
   right: 0;
   bottom: 0;
   color: whitesmoke;
+  box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.385);
   background-color: #002f4970;
   cursor: pointer;
   backdrop-filter: blur(10px);
