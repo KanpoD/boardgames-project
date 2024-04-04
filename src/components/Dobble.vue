@@ -108,16 +108,16 @@ function submit() {
         <div id="listImages" class="img-list-container" v-if="images">
             <div v-for="(image, index) in images" class="image">
                 <img class="image-file" :src="image" />
-                <button class="img-remover" @click="removeImage(index)">Remove image</button>
+                <button class="img-remover" @click="removeImage(index)">Supprimer</button>
             </div>
         </div>
         <div id="print-btn"></div>
     </div>
   </div>
   <div class="dobbleCards-container">
-    <div id="dobbleCardsID" class="dobbleCards">
+    <ul id="dobbleCardsID" class="dobbleCards">
         <DobbleCard class="" v-for="card in dobbleCards" :symbolNumber="symbolsByCard" :urls="card"/>
-    </div>
+    </ul>
   </div>
 </template>
 
@@ -155,9 +155,15 @@ function submit() {
 }
 
 .dobbleCards {
-    display: flex;
+    -webkit-column-count: 3;
+    -moz-column-count: 3;
+    column-count: 3;
     width: 80%;
     overflow: scroll;
     margin: 3rem auto;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+ 
 }
 </style>
