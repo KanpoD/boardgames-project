@@ -15,7 +15,7 @@
 
 <style>
 nav {
-    position: absolute;
+    position: fixed;
     display: flex;
     top: 0;
     left: 0;

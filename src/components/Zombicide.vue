@@ -9,7 +9,7 @@ interface TileObject {
 
 let selectedTileImage = ref<TileObject | null>(null);
 
-let elementTypeSelected = "";
+const elementTypeSelected = ref<string>("");
 
 const handleTileSelected = (
   tileObject: {
@@ -19,6 +19,7 @@ const handleTileSelected = (
   elementType: string
 ) => {
   console.log(elementType);
+  elementTypeSelected.value = elementType;
   if ("url" in tileObject && elementType === "tile") {
     selectedTileImage.value = tileObject;
     handleTool("place");
@@ -164,7 +165,7 @@ const handleCellClick = (cell: HTMLElement | null) => {
     selectedTileImage.value = null;
     // console.log("Je clique " + gridData);
   } else if (selectedTileImage.value === null && activeTool === "move") {
-    const imagePath = `url(${cell.style.backgroundImage})`;
+    // const imagePath = `url(${cell.style.backgroundImage})`;
   } else if (selectedTileImage.value === null && activeTool === "rotate") {
     rotationDegree += 90;
     cell.style.transform = `rotate(${rotationDegree}deg)`;
@@ -177,11 +178,10 @@ const handleCellClick = (cell: HTMLElement | null) => {
 };
 
 const handleState = () => {
-  console.log(elementTypeSelected);
-  if (elementTypeSelected === "token") {
+  if (elementTypeSelected.value === "token") {
     tokenGrid.classList.remove("tokenClicked");
     console.log("je rajoute la classe tokenCliked");
-  } else if (elementTypeSelected === "tile") {
+  } else if (elementTypeSelected.value === "tile") {
     tileGrid.classList.remove("tileClicked");
     console.log("je rajoute la classe tileClicked");
   }
@@ -189,14 +189,16 @@ const handleState = () => {
 
 const handleGridHover = (row: number, column: number) => {
   let cell: HTMLElement | null = null;
-  if (elementTypeSelected === "tile") {
+  if (elementTypeSelected.value === "tile") {
     cell = document.querySelector(
       `.grid-item[row="${row}"][column="${column}"]`
     ) as HTMLElement | null;
-  } else if (elementTypeSelected === "token") {
+    console.log(cell);
+  } else if (elementTypeSelected.value === "token") {
     cell = document.querySelector(
       `.grid-item-token[row="${row}"][column="${column}"]`
     ) as HTMLElement | null;
+    console.log(cell);
   }
 
   let backgroundBackup = cell?.style.backgroundImage;
@@ -216,11 +218,6 @@ const handleGridHover = (row: number, column: number) => {
   }
 };
 
-const toolSelected = ref("");
-
-const switchTool = (tool: string) => {
-  toolSelected.value = tool;
-};
 let tokenGrid: any;
 let tileGrid: any;
 onMounted(() => {
@@ -231,86 +228,91 @@ onMounted(() => {
 
 <template>
   <div class="zombicide_editor">
-    <h2 class="title">Editeur de Zombicide</h2>
     <div class="content-container">
-      <div class="left-panel">
-        <div class="elements">
-          <TileCards @tile-selected="handleTileSelected" />
+      <h2 class="title">Editeur de Zombicide</h2>
+      <div class="wrapper">
+        <div class="left-panel">
+          <div class="elements">
+            <TileCards @tile-selected="handleTileSelected" />
+          </div>
         </div>
-      </div>
-      <div class="right-content">
-        <div
-          class="right-panel"
-          ref="rightPanel"
-          @mousedown="startDrag"
-          @mousemove="drag"
-          @mouseup="endDrag"
-          @wheel="handleZoom"
-        >
+        <div class="right-content">
+          <div class="element-selected">
+            <p>{{ elementTypeSelected }}</p>
+          </div>
           <div
-            class="grid-container"
-            :style="{
-              transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
-            }"
+            class="right-panel"
+            ref="rightPanel"
+            @mousedown="startDrag"
+            @mousemove="drag"
+            @mouseup="endDrag"
+            @wheel="handleZoom"
           >
-            <div class="grid-tile-container">
-              <div
-                class="grid-row"
-                v-for="(row, rowIndex) in 12"
-                :key="rowIndex"
-              >
+            <div
+              class="grid-container"
+              :style="{
+                transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+              }"
+            >
+              <div class="grid-tile-container">
                 <div
-                  class="grid-item"
-                  v-for="(column, columnIndex) in 12"
-                  :key="columnIndex"
-                  :row="rowIndex"
-                  :column="columnIndex"
-                  :style="{ 'background-image': 'none' }"
-                  @mouseenter="handleGridHover(rowIndex, columnIndex)"
-                  @click="handleCellClick($event.target)"
-                ></div>
+                  class="grid-row"
+                  v-for="(row, rowIndex) in 6"
+                  :key="rowIndex"
+                >
+                  <div
+                    class="grid-item"
+                    v-for="(column, columnIndex) in 6"
+                    :key="columnIndex"
+                    :row="rowIndex"
+                    :column="columnIndex"
+                    :style="{ 'background-image': 'none' }"
+                    @mouseenter="handleGridHover(rowIndex, columnIndex)"
+                    @click="handleCellClick($event.target)"
+                  ></div>
+                </div>
               </div>
-            </div>
-            <div class="grid-token-container">
-              <div
-                class="grid-row-token"
-                v-for="(row, rowIndex) in 24"
-                :key="rowIndex"
-              >
+              <div class="grid-token-container">
                 <div
-                  class="grid-item-token"
-                  v-for="(column, columnIndex) in 24"
-                  :key="columnIndex"
-                  :row="rowIndex"
-                  :column="columnIndex"
-                  :style="{
-                    'background-image': 'none',
-                  }"
-                  @mouseenter="handleGridHover(rowIndex, columnIndex)"
-                  @click="handleCellClick($event.target)"
-                ></div>
+                  class="grid-row-token"
+                  v-for="(row, rowIndex) in 48"
+                  :key="rowIndex"
+                >
+                  <div
+                    class="grid-item-token"
+                    v-for="(column, columnIndex) in 48"
+                    :key="columnIndex"
+                    :row="rowIndex"
+                    :column="columnIndex"
+                    :style="{
+                      'background-image': 'none',
+                    }"
+                    @mouseenter="handleGridHover(rowIndex, columnIndex)"
+                    @click="handleCellClick($event.target)"
+                  ></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="bot-content">
-          <div class="bot-panel">
-            <div class="tools_wrapper">
-              <i
-                class="bx bx-move"
-                @click="handleTool('move'), switchTool('move')"
-                :class="{ selectedTool: activeTool.value === 'move' }"
-              ></i>
-              <i
-                class="bx bx-trash"
-                @click="handleTool('remove'), switchTool('move')"
-                :class="{ selectedTool: activeTool.value === 'remove' }"
-              ></i>
-              <i
-                class="bx bx-rotate-right"
-                @click="handleTool('rotate'), switchTool('rotate')"
-                :class="{ selectedTool: activeTool.value === 'rotate' }"
-              ></i>
+          <div class="bot-content">
+            <div class="bot-panel">
+              <div class="tools_wrapper">
+                <i
+                  class="bx bx-move"
+                  @click="handleTool('move')"
+                  :class="{ selectedTool: activeTool.value === 'move' }"
+                ></i>
+                <i
+                  class="bx bx-trash"
+                  @click="handleTool('remove')"
+                  :class="{ selectedTool: activeTool.value === 'remove' }"
+                ></i>
+                <i
+                  class="bx bx-rotate-right"
+                  @click="handleTool('rotate')"
+                  :class="{ selectedTool: activeTool.value === 'rotate' }"
+                ></i>
+              </div>
             </div>
           </div>
         </div>
@@ -321,20 +323,38 @@ onMounted(() => {
 
 <style>
 .zombicide_editor {
-  height: 90vh;
+  height: 94vh;
   width: 100vw;
+  position: absolute;
+  bottom: 0;
+  left: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  padding: .5em;
 }
 
 .content-container {
   width: 95%;
-  height: 80vh;
+  height: 100vh;
   display: flex;
+  flex-direction: column;
   box-shadow: 2px 2px 20px #000000;
   border-radius: 15px;
+  overflow: hidden;
+}
+
+.title{
+  margin: 0;
+  padding: 0;
+  color: white;
+  background-color: #003049;
+}
+
+.wrapper {
+  display: flex;
+  height: 95%;
 }
 
 .top-content {
@@ -349,8 +369,10 @@ onMounted(() => {
 }
 
 .right-content {
+  position: relative;
   display: flex;
   width: 70%;
+  height: 100%;
   flex-direction: column;
 }
 
@@ -361,12 +383,12 @@ onMounted(() => {
 .left-panel {
   width: 30%;
   height: 100%;
-  background-color: #fcbf49;
+  background: linear-gradient(to top, #003049 10%, #f9ffcc, #003049 90%);
 }
 
 .right-panel {
   width: 100%;
-  height: 100%;
+  height: 80%;
   background-color: #d62828;
   overflow: hidden;
   cursor: grab;
@@ -420,8 +442,8 @@ onMounted(() => {
 }
 
 .grid-item-token {
-  width: 50px;
-  height: 50px;
+  width: 25px;
+  height: 25px;
   background-repeat: no-repeat;
   background-size: contain;
 }
@@ -429,8 +451,8 @@ onMounted(() => {
 .grid-item {
   background-color: white;
   border: 1px solid #d62828;
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   box-sizing: border-box;
   background-repeat: no-repeat;
   background-size: cover;
@@ -449,5 +471,9 @@ onMounted(() => {
 .tileClicked,
 .tokenClicked {
   pointer-events: auto;
+}
+
+.element-selected {
+  position: fixed;
 }
 </style>

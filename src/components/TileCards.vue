@@ -371,12 +371,10 @@ export default {
       }
     },
     handleClickWin(event: any) {
-      if (this.isTileClicked && this.counter === 2) {
+      console.log('mon isTokenClicked est : ' + this.isTokenClicked);
+     if (this.onEditor) {
         this.isTileClicked = false;
-        this.activeTileIndex = null;
-        this.counter = 0;
-      } else if (this.onEditor && this.isTileClicked) {
-        this.isTileClicked = false;
+        this.isTokenClicked = false;
         this.activeTileIndex = null;
         this.counter = 0;
       }
@@ -397,9 +395,6 @@ export default {
 
 <template>
   <div class="left-container">
-    <div class="container title-container">
-      <label>ELEMENTS</label>
-    </div>
     <div class="container tiles-container">
       <img
         class="tile"
