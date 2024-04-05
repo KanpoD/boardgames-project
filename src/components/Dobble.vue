@@ -12,6 +12,13 @@ const isValid = ref(false);
 const hideParams = ref(false);
 const dobbleCards = ref([]);
 
+var html2pdfOptions = {
+  margin:       1,
+  filename:     'dobble.pdf',
+};
+
+
+
 function onSymbolAmountChange(value :any) {
     let n = symbolsByCard - 1;
     this.symbolsAmount = n * n + n + 1; 
@@ -78,7 +85,7 @@ function submit() {
 
     //Export en PDF
     let elem = document.getElementById('dobbleCardsID');
-    html2pdf().from(elem).save();
+    html2pdf().set(html2pdfOptions).from(elem).save();
 }
 </script>
 
@@ -155,15 +162,16 @@ function submit() {
 }
 
 .dobbleCards {
-    -webkit-column-count: 3;
+    /* -webkit-column-count: 3;
     -moz-column-count: 3;
-    column-count: 3;
-    width: 80%;
+    column-count: 3; */
+    width: 650px;
     overflow: scroll;
     margin: 3rem auto;
+    /* display: flex; */
+    /* flex-wrap: wrap; */
     list-style: none;
-    display: flex;
-    flex-wrap: wrap;
- 
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
 }
 </style>

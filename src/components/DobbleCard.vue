@@ -33,15 +33,19 @@ export default {
 
 <style>
 .card-container{
-  flex-basis: calc(100% / 3);
+  /* flex-basis: calc(100% / 3); */
+  width: 200px;
+  height: 200px;
+
 }
 
 .card {
   background-color: white;
+  padding: 0 !important;
   border: 2px solid black;
   border-radius: 100%;
-  width: 200px;
-  height: 200px;
+  width: 100%;
+  height: 100%;
   display: grid;
   grid-template-areas:
     'top1 top2 top3'
@@ -51,30 +55,31 @@ export default {
 }
 
 .cardImage {
-  /* position: relative; */
+  position: relative;
   width: 60px;
   height: 60px;
 }
 
 .img1 {
+  top: 0px;
   grid-area: top2;
-  /* top: 70px; */
-  transform: rotate(-90deg);
-  /* left: 10px */
+  left: 0px;
+  margin: 20px 0 0 5px;
 }
 
 .img2 {
+  top: 15px;
+  left: 23px;
   grid-area: middle1;
-  /* top: 20px; */
   transform: rotate(50deg);
-  /* left: 40px; */
+  
 }
 
 .img3 {
-  /* top: 120px; */
+  top: -38px;
+  left: -20px;
   transform: rotate(-50deg);
-  /* left: -20px; */
   grid-area: bottom3;
-  margin-top: -70px;
+  
 }
 </style>
