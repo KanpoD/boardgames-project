@@ -433,68 +433,52 @@ export default {
 
 <template>
   <div class="left-container">
-    <div class="page-btn" @click="pagesToggle()">
-      {{ pageState }} <i :class="'bx bxs-' + iconDirection + '-arrow'"></i>
+    <div class="page-btn" @click="pagesToggle()" :class="{ 'revsersed': pageState === 'Prev' }">
+      <div class="btn" >
+        {{ pageState }} <i :class="'bx bxs-' + iconDirection + '-arrow'"></i>
+      </div>
+
     </div>
 
-    <div>
-      <div
-        class="description-container"
-        :style="{ display: page === -1 ? 'block' : 'none' }"
-      >
-        <h2>Description :</h2>
-        <div>
-          <InputText/>
-        </div>
-
-        <div class="goal-container">
-          <h2>But de la partie :</h2>
-        </div>
-        <InputText/>
+    <div class="description-container" :style="{ display: page === -1 ? 'block' : 'none' }">
+      <h2>Description :</h2>
+      <div>
+        <InputText />
       </div>
+
+      <div class="goal-container">
+        <h2>But de la partie :</h2>
+      </div>
+      <InputText />
     </div>
 
     <div class="tile-page" :style="{ display: page === 1 ? 'block' : 'none' }">
       <div class="container tiles-container">
-        <img
-          class="tile"
-          v-for="(tile, index) in tiles"
-          :key="index"
-          :src="tile.url"
-          :alt="tile.alt"
-          @click="handleClick(index, $event, 'tile')"
-          :style="{
-            position:
-              isTileClicked && activeTileIndex === index
-                ? 'absolute'
-                : 'static',
-            left: tile.x + 'px',
-            top: tile.y + 'px',
-            display:
-              activeTileIndex === index && onEditor === true ? 'none' : 'block',
-          }"
-        />
+        <img class="tile" v-for="(tile, index) in tiles" :key="index" :src="tile.url" :alt="tile.alt"
+          @click="handleClick(index, $event, 'tile')" :style="{
+      position:
+        isTileClicked && activeTileIndex === index
+          ? 'absolute'
+          : 'static',
+      left: tile.x + 'px',
+      top: tile.y + 'px',
+      display:
+        activeTileIndex === index && onEditor === true ? 'none' : 'block',
+    }" />
       </div>
       <!-- pointerEvents: isTileClicked ? 'none' : 'auto' -->
       <div class="container tokens-container">
-        <img
-          class="token"
-          v-for="(token, index) in tokens"
-          :key="index"
-          :src="token.url"
-          :alt="token.alt"
-          @click="handleClick(index, $event, 'token', token.large)"
-          :style="{
-            position:
-              isTokenClicked && activeTileIndex === index
-                ? 'absolute'
-                : 'static',
-            left: token.x + 'px',
-            top: token.y + 'px',
-            display:
-              activeTileIndex === index && onEditor === true ? 'none' : 'block',
-          }"
-        />
+        <img class="token" v-for="(token, index) in tokens" :key="index" :src="token.url" :alt="token.alt"
+          @click="handleClick(index, $event, 'token', token.large)" :style="{
+      position:
+        isTokenClicked && activeTileIndex === index
+          ? 'absolute'
+          : 'static',
+      left: token.x + 'px',
+      top: token.y + 'px',
+      display:
+        activeTileIndex === index && onEditor === true ? 'none' : 'block',
+    }" />
       </div>
     </div>
   </div>
@@ -504,23 +488,33 @@ export default {
 .left-container {
   position: relative;
   overflow: hidden;
-  height: 100%;
+  height: 96%;
 }
 
 .page-btn {
   position: absolute;
   display: flex;
-  justify-content: space-around;
-  height: 10%;
+  justify-content: center;
+  align-items: center;
+  height: 5.2%;
   width: 100%;
   align-items: center;
   right: 0;
   bottom: 0;
   color: whitesmoke;
   box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.385);
-  background-color: #002f4970;
+  background-color: #202C59;
+  border-top: 1px solid grey;
   cursor: pointer;
   backdrop-filter: blur(10px);
+}
+
+.btn{
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 20%;
+  height: 100%;
 }
 
 .tile-page {
@@ -530,11 +524,17 @@ export default {
 .container {
   height: 100%;
   overflow: auto;
+  scrollbar-color: rgba(0, 0, 0, 0.593) rgba(255, 255, 255, 0.221);
+  scrollbar-width: thin;
 }
 
-.description-container{
-  height: 550px;
+.description-container {
+  height: 95%;
   overflow-y: scroll;
+  scrollbar-color: rgba(0, 0, 0, 0.593) rgba(255, 255, 255, 0.221);
+  /* Couleur de la poignée et de la piste */
+  scrollbar-width: thin;
+  /* Largeur de la barre de défilement */
 }
 
 .title-container {
@@ -556,7 +556,7 @@ export default {
   flex-wrap: wrap;
   justify-content: center;
   height: 35%;
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
 .tokens-container img {

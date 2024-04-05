@@ -8,10 +8,28 @@
             <RouterLink to="/">Go to Home</RouterLink>
             <RouterLink to="/zombicide">Go to About</RouterLink>
         </div>
+        <!-- <div :class="{ 'dark-mode': isDarkMode }">
+            <button @click="toggleMode">Toggle Mode</button>
+        </div> -->
 
     </nav>
 
 </template>
+
+<script>
+export default {
+    data() {
+        return {
+            isDarkMode: false
+        };
+    },
+    methods: {
+        toggleMode() {
+            this.isDarkMode = !this.isDarkMode;
+        }
+    }
+};
+</script>
 
 <style>
 nav {
@@ -21,7 +39,7 @@ nav {
     left: 0;
     width: 100%;
     height: 6vh;
-    background-color: #230C0F;
+    background-color: #1C2541;
 }
 
 .router_link {
@@ -31,7 +49,8 @@ nav {
 
 .logo {
     margin-left: 1em;
-    p{
+
+    p {
         margin-right: 2em;
     }
 }

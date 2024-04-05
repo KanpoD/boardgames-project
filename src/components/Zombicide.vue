@@ -232,7 +232,10 @@ onMounted(() => {
 <template>
   <div class="zombicide_editor">
     <div class="content-container">
-      <h2 class="title">Editeur de Zombicide</h2>
+      <div>
+        <h2 class="title">Editeur de Zombicide</h2>
+      </div>
+
       <div class="wrapper">
         <div class="left-panel">
           <div class="elements">
@@ -243,56 +246,25 @@ onMounted(() => {
           <div class="element-selected">
             <p>{{ elementTypeSelected }}</p>
           </div>
-          <div
-            class="right-panel"
-            ref="rightPanel"
-            @mousedown="startDrag"
-            @mousemove="drag"
-            @mouseup="endDrag"
-            @wheel="handleZoom"
-          >
-            <div
-              class="grid-container"
-              :style="{
-                transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
-              }"
-            >
+          <div class="right-panel" ref="rightPanel" @mousedown="startDrag" @mousemove="drag" @mouseup="endDrag"
+            @wheel="handleZoom">
+            <div class="grid-container" :style="{
+              transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+            }">
               <div class="grid-tile-container">
-                <div
-                  class="grid-row"
-                  v-for="(row, rowIndex) in 6"
-                  :key="rowIndex"
-                >
-                  <div
-                    class="grid-item"
-                    v-for="(column, columnIndex) in 6"
-                    :key="columnIndex"
-                    :row="rowIndex"
-                    :column="columnIndex"
-                    :style="{ 'background-image': 'none' }"
-                    @mouseenter="handleGridHover(rowIndex, columnIndex)"
-                    @click="handleCellClick($event.target)"
-                  ></div>
+                <div class="grid-row" v-for="(row, rowIndex) in 6" :key="rowIndex">
+                  <div class="grid-item" v-for="(column, columnIndex) in 6" :key="columnIndex" :row="rowIndex"
+                    :column="columnIndex" :style="{ 'background-image': 'none' }"
+                    @mouseenter="handleGridHover(rowIndex, columnIndex)" @click="handleCellClick($event.target)"></div>
                 </div>
               </div>
               <div class="grid-token-container">
-                <div
-                  class="grid-row-token"
-                  v-for="(row, rowIndex) in 48"
-                  :key="rowIndex"
-                >
-                  <div
-                    class="grid-item-token"
-                    v-for="(column, columnIndex) in 48"
-                    :key="columnIndex"
-                    :row="rowIndex"
-                    :column="columnIndex"
-                    :style="{
-                      'background-image': 'none',
-                    }"
-                    @mouseenter="handleGridHover(rowIndex, columnIndex)"
-                    @click="handleCellClick($event.target)"
-                  ></div>
+                <div class="grid-row-token" v-for="(row, rowIndex) in 48" :key="rowIndex">
+                  <div class="grid-item-token" v-for="(column, columnIndex) in 48" :key="columnIndex" :row="rowIndex"
+                    :column="columnIndex" :style="{
+              'background-image': 'none',
+            }" @mouseenter="handleGridHover(rowIndex, columnIndex)" @click="handleCellClick($event.target)">
+                  </div>
                 </div>
               </div>
             </div>
@@ -300,21 +272,12 @@ onMounted(() => {
           <div class="bot-content">
             <div class="bot-panel">
               <div class="tools_wrapper">
-                <i
-                  class="bx bx-move"
-                  @click="handleTool('move')"
-                  :class="{ selectedTool: activeTool.value === 'move' }"
-                ></i>
-                <i
-                  class="bx bx-trash"
-                  @click="handleTool('remove')"
-                  :class="{ selectedTool: activeTool.value === 'remove' }"
-                ></i>
-                <i
-                  class="bx bx-rotate-right"
-                  @click="handleTool('rotate')"
-                  :class="{ selectedTool: activeTool.value === 'rotate' }"
-                ></i>
+                <i class="bx bx-move" @click="handleTool('move')"
+                  :class="{ selectedTool: activeTool.value === 'move' }"></i>
+                <i class="bx bx-trash" @click="handleTool('remove')"
+                  :class="{ selectedTool: activeTool.value === 'remove' }"></i>
+                <i class="bx bx-rotate-right" @click="handleTool('rotate')"
+                  :class="{ selectedTool: activeTool.value === 'rotate' }"></i>
               </div>
             </div>
           </div>
@@ -343,23 +306,23 @@ onMounted(() => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 2px 20px #000000;
+  box-shadow: 0 0 20px 0px #0000009d;
   border-radius: 15px;
   border: 1px solid grey;
   overflow: hidden;
 }
 
-.title{
+.title {
   margin: 0;
   padding: 0;
   color: white;
-  background-color: #003049;
+  background-color: #3A506B;
   border-bottom: 1px solid grey;
 }
 
 .wrapper {
   display: flex;
-  height: 95%;
+  height: 100%;
 }
 
 .top-content {
@@ -369,9 +332,11 @@ onMounted(() => {
 
 .bot-content {
   display: flex;
-  height: 20%;
-  background-color: #003049;
+  background-color: #3A506B;
+  box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.385);
   border-top: 1px solid grey;
+  z-index: 1;
+
 }
 
 .right-content {
@@ -389,23 +354,24 @@ onMounted(() => {
 .left-panel {
   width: 30%;
   height: 100%;
-  background: linear-gradient(to top, #003049 10%, #014163, #003049 90%);
+  background: linear-gradient(to top, #3A506B 10%, #1C2541, #3A506B 90%);
   border-right: 1px solid grey;
+  z-index: 2;
 }
 
 .right-panel {
   width: 100%;
-  height: 80%;
-  background-color: #d62828;
+  height: 90%;
+  background-color: #0B132B;
   overflow: hidden;
   cursor: grab;
   position: relative;
+  
 }
 
 .bot-panel {
   display: flex;
   width: 100%;
-  height: 100%;
 }
 
 .tools_wrapper {
@@ -424,14 +390,17 @@ onMounted(() => {
   border: 2px solid rgba(245, 245, 245, 0);
   transition: all .3s ease;
 }
-.tools_wrapper i:hover{
+
+.tools_wrapper i:hover {
   border: 2px solid whitesmoke;
   border-radius: 10px;
 }
-.tools_wrapper i:active{
+
+.tools_wrapper i:active {
   border: 2px solid whitesmoke;
   border-radius: 10px;
 }
+
 .selectedTool {
   border: 4px solid white;
   border-radius: 15px;
@@ -467,7 +436,7 @@ onMounted(() => {
 
 .grid-item {
   background-color: white;
-  border: 1px solid #d62828;
+  border: 1px solid #0B132B;
   width: 200px;
   height: 200px;
   box-sizing: border-box;
@@ -495,8 +464,7 @@ onMounted(() => {
 }
 
 .large-token {
-  width: 200%; /* Par exemple, un token large occupe deux fois la largeur d'un token normal */
-  height: 200%; /* Même hauteur que la largeur pour garder un aspect carré */
-  /* Ajoutez d'autres styles selon vos besoins */
+  width: 200%;
+  height: 200%;
 }
 </style>

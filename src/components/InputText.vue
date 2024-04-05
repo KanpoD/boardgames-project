@@ -39,8 +39,8 @@ export default {
 <style scoped>
 .resizable-textarea {
   width: 100%;
-  max-width: 275px;
-  min-width: 100px;
-  min-height: 100px;
+  max-width: 90%;
+  min-width: 60%;
+  min-height: 200px;
 }
 </style>
