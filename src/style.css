@@ -190,3 +190,18 @@ button:focus-visible {
   margin: 0 auto;
   text-align: center;
 }
+
+
+/* Dobble Cards common style */
+.card-container{
+  width: 200px;
+  height: 200px;
+}
+
+
+.cardImage {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
